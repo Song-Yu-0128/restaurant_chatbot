@@ -1,0 +1,28 @@
+
+1-Page Summary: Restaurant Reservation Chatbot Prototype
+
+Prototype Utility
+This prototype is a conversational restaurant reservation chatbot that guides users through the process of making a table booking using natural language. By leveraging a large language model (LLM) via Cohere’s API, the chatbot can extract structured reservation details (number of people, date, time, name, and phone number) from free-text user input. It enables multi-turn interactions by prompting the user for any missing information, helping simulate a real-world digital concierge experience.
+
+Main Design Decisions
+1. LLM-Powered Slot Filling
+   The prototype uses Cohere's hosted LLM to extract structured JSON from user messages. The model is prompted to return only the fields needed: people, day, time, name, and phone.
+
+2. Multi-Turn Dialogue with State Management
+   Streamlit’s session_state is used to persist slot values and chat history across reruns. This allows for multi-turn conversations where the chatbot fills missing information step-by-step.
+
+3. Strict Slot Order Enforcement
+   Even if the LLM returns incomplete or incorrect data (e.g. guessing a name), the system explicitly checks and prompts for missing values in the fixed order: people → day → time → name → phone.
+
+4. User Override and Correction Handling
+   If a slot is missing, the system temporarily disables LLM parsing and instead accepts the next user message as a direct answer to the missing field.
+
+Main Difficulties Faced
+- LLM Hallucinations and JSON Parsing
+  The LLM sometimes returned hallucinated names or poorly formatted JSON. This was mitigated using strict JSON prompts and error handling via try/except.
+
+- Input Box Reset in Streamlit
+  Streamlit does not allow updating text input values after they are rendered. To work around this, the input box was wrapped in a dynamic placeholder (st.empty()), allowing it to be reset between turns.
+
+- Managing Session State and Reruns
+  Streamlit’s auto-rerun behavior made it tricky to maintain conversational context. The final design carefully tracks last_missing_slot to determine when to bypass the LLM and store user replies directly.
